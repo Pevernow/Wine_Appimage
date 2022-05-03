@@ -1,22 +1,70 @@
-#!/bin/bash
-HERE="$(dirname "$(readlink -f "${0}")")"
+# This is a basic workflow to help you get started with Actions
 
-export LD_LIBRARY_PATH="$HERE/usr/lib":$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH="$HERE/usr/lib/i386-linux-gnu":$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH="$HERE/lib":$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH="$HERE/lib/i386-linux-gnu":$LD_LIBRARY_PATH
+name: CI
 
-#Sound Library
-export LD_LIBRARY_PATH="$HERE/usr/lib/i386-linux-gnu/pulseaudio":$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH="$HERE/usr/lib/i386-linux-gnu/alsa-lib":$LD_LIBRARY_PATH
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
-# Allow use direct 3D apps
-export LIBGL_DRIVERS_PATH="${HERE}/usr/lib/i386-linux-gnu/dri"
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
-#Font Config
-export FONTCONFIG_PATH="$HERE/etc/fonts"
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-18.04
 
-#LD
-export WINELDLIBRARY="$HERE/lib/ld-linux.so.2"
-
-LD_PRELOAD="$HERE/bin/libhookexecv.so" "$WINELDLIBRARY" "$HERE/opt/wine-stable/bin/wine" "$@" | cat
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Packing_wine
+        run: |
+         sudo dpkg --add-architecture i386 
+         wget -nc https://dl.winehq.org/wine-builds/winehq.key
+         sudo mv winehq.key /usr/share/keyrings/winehq-archive.key
+         wget -nc https://dl.winehq.org/wine-builds/ubuntu/dists/bionic/winehq-bionic.sources
+         sudo mv winehq-bionic.sources /etc/apt/sources.list.d/
+         sudo apt update
+         sudo apt-get clean
+         sudo apt-get --download-only install winehq-stable:i386
+         sudo apt download fontconfig-config
+         mkdir appdir
+         cd appdir
+         sudo find /var/cache/apt/archives/ -name *.deb -exec dpkg -x {} ./ \;
+         cd ../
+         git clone https://github.com/probonopd/libhookexecv.git
+         cd libhookexecv
+         sudo apt-get -y install gcc-multilib
+         gcc -shared -fPIC -m32 -ldl libhookexecv.c -o libhookexecv.so
+         gcc -std=c99 -m32 -static preloaderhook.c -o wine-preloader_hook
+         chmod 777 libhookexecv.so
+         chmod 777 wine-preloader_hook
+         sudo mkdir ../appdir/bin
+         sudo cp libhookexecv.so ../appdir/bin/
+         sudo cp wine-preloader_hook ../appdir/bin/
+         cd ..
+         wget -nv -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O  appimagetool.AppImage
+         sudo chmod +x appimagetool.AppImage
+         sudo chmod +x AppRun
+         sudo cp AppRun appdir/
+         sudo cp resource/* appdir/
+         sudo ./appimagetool.AppImage --appimage-extract
+         sudo ARCH=x86_64 squashfs-root/AppRun appdir
+         ls -a
+         sudo chmod 777 ./Wine-x86_64.AppImage
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+         repo_token: "${{ secrets.GITHUB_TOKEN }}"
+         automatic_release_tag: "latest"
+         prerelease: true
+         title: "Auto Build"
+         files: |
+           Wine-x86_64.AppImage
