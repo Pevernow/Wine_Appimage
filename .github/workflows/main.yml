@@ -39,7 +39,9 @@ jobs:
          mkdir appdir
          cd appdir
          sudo find /var/cache/apt/archives/ -name *.deb -exec dpkg -x {} ./ \;
-         cd ../
+         cd bin
+         ls -a
+         cd ../..
          git clone https://github.com/probonopd/libhookexecv.git
          cd libhookexecv
          sudo apt-get -y install gcc-multilib
@@ -51,12 +53,14 @@ jobs:
          sudo cp libhookexecv.so ../appdir/bin/
          sudo cp wine-preloader_hook ../appdir/bin/
          cd ..
+         ls appdir/bin
          wget -nv -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O  appimagetool.AppImage
          sudo chmod +x appimagetool.AppImage
          sudo chmod +x AppRun
          sudo cp AppRun appdir/
          sudo cp resource/* appdir/
          sudo ./appimagetool.AppImage --appimage-extract
+         ls appdir/bin
          sudo ARCH=x86_64 squashfs-root/AppRun appdir
          ls -a
          sudo chmod 777 ./Wine-x86_64.AppImage
