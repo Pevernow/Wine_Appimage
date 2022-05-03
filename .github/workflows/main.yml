@@ -37,7 +37,7 @@ jobs:
          sudo mv winehq-bionic.sources /etc/apt/sources.list.d/
          sudo apt update
          sudo apt-get clean
-         sudo apt-get --download-only install winehq-stable
+         sudo apt-get --download-only install winehq-stable:i386
          sudo apt download fontconfig-config
          mkdir appdir
          cd appdir
@@ -50,6 +50,7 @@ jobs:
          gcc -std=c99 -m32 -static preloaderhook.c -o wine-preloader_hook
          chmod 777 libhookexecv.so
          chmod 777 wine-preloader_hook
+         mkdir ../appdir/bin
          sudo cp libhookexecv.so ../appdir/bin/
          sudo cp wine-preloader_hook ../appdir/bin/
          cd ..
