@@ -58,3 +58,12 @@ jobs:
          sudo ./appimagetool.AppImage --appimage-extract
          sudo ARCH=x86_64 squashfs-root/AppRun appdir
          ls -a
+         sudo chmod 777 ./Wine-x86_64.AppImage
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+         repo_token: "${{ secrets.GITHUB_TOKEN }}"
+         automatic_release_tag: "latest"
+         prerelease: true
+         title: "Auto Build"
+         files: |
+           Wine-x86_64.AppImage
