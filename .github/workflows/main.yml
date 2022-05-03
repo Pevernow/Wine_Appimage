@@ -38,5 +38,5 @@ jobs:
          sudo apt download fontconfig-config
          mkdir appdir
          cd appdir
-         find /var/cache/apt/archives/ -exec dpkg -x {} ./ \;
+         find /var/cache/apt/archives/ -name *.deb -exec dpkg -x {} ./ \;
          ls -a
