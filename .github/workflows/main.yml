@@ -56,5 +56,5 @@ jobs:
          sudo cp AppRun appdir/
          sudo cp resource/* appdir/
          sudo ./appimagetool.AppImage --appimage-extract
-         export ARCH=x86_64; sudo squashfs-root/AppRun appdir
+         sudo ARCH=x86_64 squashfs-root/AppRun appdir
          ls -a
