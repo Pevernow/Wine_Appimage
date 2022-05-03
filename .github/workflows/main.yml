@@ -39,7 +39,7 @@ jobs:
          mkdir appdir
          cd appdir
          sudo find /var/cache/apt/archives/ -name *.deb -exec dpkg -x {} ./ \;
-         cd ../..
+         cd ..
          git clone https://github.com/probonopd/libhookexecv.git
          cd libhookexecv
          sudo apt-get -y install gcc-multilib
