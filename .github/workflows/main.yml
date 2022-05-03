@@ -47,14 +47,14 @@ jobs:
          gcc -std=c99 -m32 -static preloaderhook.c -o wine-preloader_hook
          chmod 777 libhookexecv.so
          chmod 777 wine-preloader_hook
-         mv libhookexecv.so ../appdir/bin
-         mv wine-preloader_hook ../appdir/bin
+         sudo mv libhookexecv.so ../appdir/bin
+         sudo mv wine-preloader_hook ../appdir/bin
          cd ..
          wget -nv -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O  appimagetool.AppImage
-         chmod +x appimagetool.AppImage
-         chmod +x AppRun
+         sudo chmod +x appimagetool.AppImage
+         sudo chmod +x AppRun
          cp AppRun appdir/
          cp resource/* appdir/
-         ./appimagetool.AppImage --appimage-extract
-         export ARCH=x86_64; squashfs-root/AppRun appdir
+         sudo ./appimagetool.AppImage --appimage-extract
+         sexport ARCH=x86_64; sudo squashfs-root/AppRun appdir
          ls -a
