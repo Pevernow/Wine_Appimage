@@ -27,9 +27,6 @@ jobs:
       
       - name: Packing_wine
         run: |
-         sudo apt update
-         sudo apt install -y lubuntu-desktop
-         sudo apt-get clean
          sudo dpkg --add-architecture i386 
          wget -nc https://dl.winehq.org/wine-builds/winehq.key
          sudo mv winehq.key /usr/share/keyrings/winehq-archive.key
@@ -50,7 +47,7 @@ jobs:
          gcc -std=c99 -m32 -static preloaderhook.c -o wine-preloader_hook
          chmod 777 libhookexecv.so
          chmod 777 wine-preloader_hook
-         mkdir ../appdir/bin
+         sudo mkdir ../appdir/bin
          sudo cp libhookexecv.so ../appdir/bin/
          sudo cp wine-preloader_hook ../appdir/bin/
          cd ..
